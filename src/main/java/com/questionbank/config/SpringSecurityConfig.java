@@ -27,12 +27,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 
-    @Bean
+   /* @Bean
     CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
-    }
+    }*/
     
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {

@@ -12,12 +12,14 @@ import com.questionbank.repository.BookRepository;
 import com.questionbank.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -46,11 +48,16 @@ public class QuestionBankController {
 
 	@GetMapping("/login")
 	public ResponseEntity<User> currentUserName(Authentication authentication) throws ResourceNotFoundException {
+		HttpHeaders responseHeaders = new HttpHeaders();
+		String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+		System.out.println("Session id : "+sessionId);
+		responseHeaders.set("JSESSIONID", sessionId);
 		User user = userRepository.getUserByName(authentication.getName());
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + authentication.getName());
 		}
-		return ResponseEntity.ok().body(user);
+		return ResponseEntity.ok()
+			      .headers(responseHeaders).body(user);
 	}
 
 	@PostMapping("/registerUser")
