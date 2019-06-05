@@ -32,7 +32,7 @@ import com.questionbank.service.QuestionBankService;
 
 @RestController
 @Validated
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*",allowCredentials="true")
 public class QuestionBankController {
 
 	@Autowired
