@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -32,12 +34,22 @@ public class User {
 	@Column(name = "MOBILE_NUMBER")
 	private String mobileNumber;
 
+	@Transient
+	private String jsessionId;
+	
+	public String getJsessionId() {
+		return jsessionId;
+	}
+	public void setJsessionId(String jsessionId) {
+		this.jsessionId = jsessionId;
+	}
+	
 	@Override
 	public String toString() {
 		return "User [username=" + username + ", firstName=" + firstName + ", role=" + role + ", lastName=" + lastName
-				+ ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber + ", password=" + password
-				+ ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", updatedBy="
-				+ updatedBy + ", updatedDate=" + updatedDate + "]";
+				+ ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber + ", jsessionId=" + jsessionId
+				+ ", password=" + password + ", createdBy=" + createdBy + ", createdDate=" + createdDate
+				+ ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
 	}
 	public User() {
     }

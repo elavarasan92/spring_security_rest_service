@@ -55,6 +55,8 @@ public class QuestionBankController {
 		User user = userRepository.getUserByName(authentication.getName());
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + authentication.getName());
+		}else {
+			user.setJsessionId(sessionId);
 		}
 		return ResponseEntity.ok()
 			      .headers(responseHeaders).body(user);
