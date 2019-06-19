@@ -32,9 +32,14 @@ import java.util.Map;
 
 import com.questionbank.service.QuestionBankService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+
 @RestController
 @Validated
 @CrossOrigin(origins = "*", allowedHeaders = "*",allowCredentials="true",exposedHeaders="true")
+@Api(value = "Question bank System", description = "Question bank")
 public class QuestionBankController {
 
 	@Autowired
@@ -46,6 +51,7 @@ public class QuestionBankController {
 	@Autowired
 	private UserRepository userRepository;
 
+	@ApiOperation(value = "Login", authorizations = @Authorization(value = "basic"))
 	@GetMapping("/login")
 	public ResponseEntity<User> currentUserName(Authentication authentication) throws ResourceNotFoundException {
 		HttpHeaders responseHeaders = new HttpHeaders();
@@ -143,7 +149,7 @@ public class QuestionBankController {
 		return questionBankService.addCourses(courseList);
 	}
 
-	@GetMapping("/authyears/courseid/{courseid}")
+	@GetMapping("/auth/years/courseid/{courseid}")
 	public List<Year> getYearsByCourseId(@PathVariable(value = "courseid") Long courseID)
 			throws ResourceNotFoundException {
 		return questionBankService.getYearsByCourseId(courseID);
@@ -175,7 +181,7 @@ public class QuestionBankController {
 		return questionBankService.getAllSubjects();
 	}
 
-	// Find
+	/*// Find
 	@GetMapping("/auth/books")
 	List<Book> findAll() {
 		return repository.findAll();
@@ -239,6 +245,6 @@ public class QuestionBankController {
 	@DeleteMapping("/auth/books/{id}")
 	void deleteBook(@PathVariable Long id) {
 		repository.deleteById(id);
-	}
+	}*/
 
 }
