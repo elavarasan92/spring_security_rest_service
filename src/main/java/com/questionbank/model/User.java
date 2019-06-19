@@ -34,6 +34,17 @@ public class User {
 	@Column(name = "MOBILE_NUMBER")
 	private String mobileNumber;
 
+	@Column(name = "OTP")
+	private String otp;
+
+	
+	public String getOtp() {
+		return otp;
+	}
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
 	@Transient
 	private String jsessionId;
 	
@@ -44,11 +55,12 @@ public class User {
 		this.jsessionId = jsessionId;
 	}
 	
+	
 	@Override
 	public String toString() {
 		return "User [username=" + username + ", firstName=" + firstName + ", role=" + role + ", lastName=" + lastName
-				+ ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber + ", jsessionId=" + jsessionId
-				+ ", password=" + password + ", createdBy=" + createdBy + ", createdDate=" + createdDate
+				+ ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber + ", otp=" + otp + ", jsessionId="
+				+ jsessionId + ", password=" + password + ", createdBy=" + createdBy + ", createdDate=" + createdDate
 				+ ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
 	}
 	public User() {

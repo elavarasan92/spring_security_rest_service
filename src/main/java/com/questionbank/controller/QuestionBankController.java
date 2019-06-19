@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.questionbank.service.QuestionBankService;
+import com.questionbank.util.QUtils;
+import com.questionbank.util.SendEmailTLS;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,12 +48,9 @@ public class QuestionBankController {
 	private QuestionBankService questionBankService;
 
 	@Autowired
-	private BookRepository repository;
-
-	@Autowired
 	private UserRepository userRepository;
 
-	@ApiOperation(value = "Login", authorizations = @Authorization(value = "basic"))
+	
 	@GetMapping("/login")
 	public ResponseEntity<User> currentUserName(Authentication authentication) throws ResourceNotFoundException {
 		HttpHeaders responseHeaders = new HttpHeaders();
@@ -79,6 +78,48 @@ public class QuestionBankController {
 			return null;
 		}
 	}
+	
+	@GetMapping("/forgotPassword/{emailId}")
+	public ResponseEntity<String> forgotPassword(@PathVariable(value = "emailId") String emailId) { 
+		User userDet = userRepository.getUserByEmail(emailId);
+		if (userDet != null) {
+			String otp = QUtils.getOTP();
+			userDet.setOtp(otp);
+			questionBankService.updateUser(userDet);
+			SendEmailTLS.sendOTP(emailId,otp);
+			return ResponseEntity.ok().body("OTP Sent successfully");
+		} else {
+			System.out.println("OTP creation failed");
+			return ResponseEntity.ok().body("Email or User doesnot exist ");
+		}
+	}
+	
+	
+	@GetMapping("/validateOTP/{emailId}/{otp}")
+	public ResponseEntity<String> validateOTP(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "otp") String otp) { 
+		User userDet = userRepository.validateOTP(emailId,otp);
+		if (userDet != null) {
+			return ResponseEntity.ok().body("Valid otp");
+		} else {
+			System.out.println("OTP validation failed");
+			return ResponseEntity.ok().body("Invalid otp");
+		}
+	}
+	
+	@GetMapping("/resetPassword/{emailId}/{password}")
+	public ResponseEntity<String> resetPassword(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "password") String password) { 
+		User userDet = userRepository.getUserByEmail(emailId);
+		if (userDet != null) {
+			String otp = QUtils.getOTP();
+			userDet.setPassword(password);
+			questionBankService.updateUser(userDet);
+			return ResponseEntity.ok().body("Password updated successfully");
+		} else {
+			System.out.println("OTP creation failed");
+			return ResponseEntity.ok().body("Email or User doesnot exist ");
+		}
+	}
+	
 	
 	@GetMapping("/auth/users")
 	public List<User> getAllUsers() {
