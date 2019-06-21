@@ -14,12 +14,15 @@ com\questionbank\exception\ResourceNotFoundException.class
 com\questionbank\model\Course.class
 com\questionbank\error\validator\AuthorValidator.class
 com\questionbank\error\CustomGlobalExceptionHandler.class
+com\questionbank\util\QUtils.class
 com\questionbank\error\BookNotFoundException.class
 com\questionbank\config\SpringSecurityConfig.class
+com\questionbank\util\SendEmailTLS.class
 com\questionbank\repository\SubjectRepository.class
 com\questionbank\exception\ErrorDetails.class
 com\questionbank\service\QuestionBankService.class
 com\questionbank\config\CustomBasicAuthenticationEntryPoint.class
 com\questionbank\config\SwaggerConfig.class
 com\questionbank\model\User.class
+com\questionbank\util\SendEmailTLS$1.class
 com\questionbank\repository\YearRepository.class

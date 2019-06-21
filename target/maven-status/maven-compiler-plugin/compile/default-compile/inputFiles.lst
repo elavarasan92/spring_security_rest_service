@@ -1,6 +1,7 @@
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\error\validator\AuthorValidator.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\config\CustomAuthenticationProvider.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\config\SpringSecurityConfig.java
+F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\util\SendEmailTLS.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\model\Book.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\controller\QuestionBankController.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\exception\ErrorDetails.java
@@ -19,6 +20,7 @@ F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\quest
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\error\validator\Author.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\repository\CourseRepository.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\config\CustomBasicAuthenticationEntryPoint.java
+F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\util\QUtils.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\error\BookUnSupportedFieldPatchException.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\exception\ResourceNotFoundException.java
 F:\Repository\question_bank_spring_security_rest_service\src\main\java\com\questionbank\model\Course.java

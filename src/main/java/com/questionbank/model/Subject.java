@@ -21,6 +21,17 @@ public class Subject {
 	
 	@Column(name = "SUBJECT_NAME")
 	private String subjectName;
+	
+	@Column(name = "SUBJECT_CODE")
+	private String subjectCode;
+
+	public String getSubjectCode() {
+		return subjectCode;
+	}
+
+	public void setSubjectCode(String subjectCode) {
+		this.subjectCode = subjectCode;
+	}
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -98,9 +109,12 @@ public class Subject {
 
 	@Override
 	public String toString() {
-		return "Subject [subjectID=" + subjectID + ", subjectName=" + subjectName + ", createdBy=" + createdBy
-				+ ", createdDate=" + createdDate + ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
+		return "Subject [subjectID=" + subjectID + ", subjectName=" + subjectName + ", subjectCode=" + subjectCode
+				+ ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", updatedBy=" + updatedBy
+				+ ", updatedDate=" + updatedDate + ", yearID=" + yearID + "]";
 	}
+
+	
 
 	
 }
