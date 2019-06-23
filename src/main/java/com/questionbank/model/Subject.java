@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,9 +21,11 @@ public class Subject {
 	private long subjectID;
 	
 	@Column(name = "SUBJECT_NAME")
+	@NotNull(message = "Please provide subject name")
 	private String subjectName;
 	
 	@Column(name = "SUBJECT_CODE")
+	@NotNull(message = "Please provide subject code")
 	private String subjectCode;
 
 	public String getSubjectCode() {
@@ -48,6 +51,7 @@ public class Subject {
 	private Timestamp updatedDate;
 	
 	@Column(name = "YEAR_ID")
+	@NotNull(message = "Please provide year id")
 	private long yearID;
 	
 	

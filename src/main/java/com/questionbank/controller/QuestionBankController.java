@@ -1,42 +1,31 @@
 package com.questionbank.controller;
 
-import com.questionbank.error.BookNotFoundException;
-import com.questionbank.error.BookUnSupportedFieldPatchException;
 import com.questionbank.exception.ResourceNotFoundException;
-import com.questionbank.model.Book;
 import com.questionbank.model.Course;
 import com.questionbank.model.Subject;
 import com.questionbank.model.User;
 import com.questionbank.model.Year;
-import com.questionbank.repository.BookRepository;
-import com.questionbank.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.questionbank.service.QuestionBankService;
 import com.questionbank.util.QUtils;
 import com.questionbank.util.SendEmailTLS;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 
 @RestController
 @Validated
@@ -47,17 +36,14 @@ public class QuestionBankController {
 	@Autowired
 	private QuestionBankService questionBankService;
 
-	@Autowired
-	private UserRepository userRepository;
-
 	
 	@GetMapping("/login")
-	public ResponseEntity<User> currentUserName(Authentication authentication) throws ResourceNotFoundException {
+	public ResponseEntity<User> login(Authentication authentication) throws ResourceNotFoundException {
 		HttpHeaders responseHeaders = new HttpHeaders();
 		String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
 		System.out.println("Session id : "+sessionId);
 		responseHeaders.set("JSESSIONID", sessionId);
-		User user = userRepository.getUserByName(authentication.getName());
+		User user = questionBankService.getUserByName(authentication.getName());
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + authentication.getName());
 		}else {
@@ -68,8 +54,8 @@ public class QuestionBankController {
 	}
 
 	@PostMapping("/registerUser")
-	public ResponseEntity<User> createUser(@Valid @RequestBody User user) { 
-		User userDet = userRepository.getUserByName(user.getUsername());
+	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) { 
+		User userDet =  questionBankService.getUserByName(user.getUsername());
 		if (userDet == null) {
 			userDet = questionBankService.registerUser(user);
 			return ResponseEntity.ok().body(userDet);
@@ -81,7 +67,7 @@ public class QuestionBankController {
 	
 	@GetMapping("/forgotPassword/{emailId}")
 	public ResponseEntity<String> forgotPassword(@PathVariable(value = "emailId") String emailId) { 
-		User userDet = userRepository.getUserByEmail(emailId);
+		User userDet = questionBankService.getUserByEmail(emailId);
 		if (userDet != null) {
 			String otp = QUtils.getOTP();
 			userDet.setOtp(otp);
@@ -97,7 +83,7 @@ public class QuestionBankController {
 	
 	@GetMapping("/validateOTP/{emailId}/{otp}")
 	public ResponseEntity<String> validateOTP(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "otp") String otp) { 
-		User userDet = userRepository.validateOTP(emailId,otp);
+		User userDet = questionBankService.validateOtp(emailId,otp);
 		if (userDet != null) {
 			return ResponseEntity.ok().body("Valid otp");
 		} else {
@@ -108,9 +94,8 @@ public class QuestionBankController {
 	
 	@GetMapping("/resetPassword/{emailId}/{password}")
 	public ResponseEntity<String> resetPassword(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "password") String password) { 
-		User userDet = userRepository.getUserByEmail(emailId);
+		User userDet = questionBankService.getUserByEmail(emailId);
 		if (userDet != null) {
-			String otp = QUtils.getOTP();
 			userDet.setPassword(password);
 			questionBankService.updateUser(userDet);
 			return ResponseEntity.ok().body("Password updated successfully");
@@ -121,15 +106,15 @@ public class QuestionBankController {
 	}
 	
 	
-	@GetMapping("/auth/users")
+	@GetMapping("/auth/getAllUsers")
 	public List<User> getAllUsers() {
 		return questionBankService.getAllUsers();
 	}
 
-	@GetMapping("/auth/{username}")
+	@GetMapping("/auth/getUserById/{username}")
 	public ResponseEntity<User> getUserById(@PathVariable(value = "username") String username)
 			throws ResourceNotFoundException {
-		User user = userRepository.getUserByName(username);
+		User user = questionBankService.getUserByName(username);
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + username);
 		}
@@ -138,10 +123,10 @@ public class QuestionBankController {
 
 	
 
-	@PutMapping("/auth/{username}")
+	@PutMapping("/auth/updateUser/{username}")
 	public ResponseEntity<User> updateUser(@PathVariable(value = "username") String username,
 			@Valid @RequestBody User userDetails) throws ResourceNotFoundException {
-		User user = userRepository.getUserByName(username);
+		User user = questionBankService.getUserByName(username);
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + username);
 		}
@@ -153,32 +138,28 @@ public class QuestionBankController {
 		return ResponseEntity.ok(updatedUser);
 	}
 
-	@DeleteMapping("/auth/{username}")
+	@DeleteMapping("/auth/deleteUser/{username}")
 	public Map<String, Boolean> deleteUser(@PathVariable(value = "username") String username)
 			throws ResourceNotFoundException {
-		User user = userRepository.getUserByName(username);
+		User user = questionBankService.getUserByName(username);
 		if (user == null) {
 			new ResourceNotFoundException("User not found :: " + username);
 		}
-		userRepository.delete(user);
+		questionBankService.deleteUserByName(user);
 		Map<String, Boolean> response = new HashMap<>();
 		response.put("deleted", Boolean.TRUE);
 		return response;
 	}
 
-	@GetMapping("/auth/courses")
+	@GetMapping("/auth/getAllCourses")
 	public List<Course> getAllCourses() {
 		return questionBankService.getAllCourses();
 	}
 
-	@PostMapping("/auth/addcourse")
-	public Course addCourse(@Valid @RequestBody Course course) {
-		return questionBankService.addCourse(course);
-	}
 
-	@PutMapping("/auth/{id}")
-	public ResponseEntity<Course> update(@PathVariable Long id, @Valid @RequestBody Course course) {
-		if (!questionBankService.findById(id).isPresent()) {
+	@PutMapping("/auth/updateCourse/{id}")
+	public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody Course course) {
+		if (!questionBankService.checkCourse(id).isPresent()) {
 			System.out.println("Id " + id + " is not existed");
 			ResponseEntity.badRequest().build();
 		}
@@ -190,37 +171,73 @@ public class QuestionBankController {
 		return questionBankService.addCourses(courseList);
 	}
 
-	@GetMapping("/auth/years/courseid/{courseid}")
+	@GetMapping("/auth/getYearsByCourseId/{courseid}")
 	public List<Year> getYearsByCourseId(@PathVariable(value = "courseid") Long courseID)
 			throws ResourceNotFoundException {
 		return questionBankService.getYearsByCourseId(courseID);
 	}
 
-	@PostMapping("/auth/addyears")
+	@PostMapping("/auth/addYearsForCourses")
 	public List<Year> addYearsForCourses(@Valid @RequestBody List<Year> yearList) {
 		return questionBankService.addYearsForCourses(yearList);
 	}
 
-	@GetMapping("/auth/subjects/yearid/{yearid}")
+	@GetMapping("/auth/getSubjectsByYearId/{yearid}")
 	public List<Subject> getSubjectsByYearId(@PathVariable(value = "yearid") Long yearID)
 			throws ResourceNotFoundException {
 		return questionBankService.getSubjectsByYearId(yearID);
 	}
 
-	@PostMapping("/auth/addsubjects")
-	public List<Subject> addSubjectForYears(@RequestBody List<Subject> subjectList) {
+	@PostMapping("/auth/addSubjectForYears")
+	public List<Subject> addSubjectForYears(@Valid @RequestBody List<Subject> subjectList) {
 		return questionBankService.addSubjectForYears(subjectList);
 	}
 
-	@GetMapping("/auth/years")
+	@GetMapping("/auth/getAllYears")
 	public List<Year> getAllYears(long courseId) {
 		return questionBankService.getAllYears();
 	}
 
-	@GetMapping("/auth/subjects")
+	@GetMapping("/auth/getAllSubjects")
 	public List<Subject> getAllSubjects() {
 		return questionBankService.getAllSubjects();
 	}
+	
+	@PutMapping("/auth/updateSubject/{id}")
+	public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @Valid @RequestBody Subject subject) {
+		if (!questionBankService.checkSubject(id).isPresent()) {
+			System.out.println("Id " + id + " is not existed");
+			ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok(questionBankService.saveSubject(subject));
+	}
+
+	@DeleteMapping("/auth/deleteSubject/{id}")
+	public Map<String, Boolean> deleteSubject(@PathVariable Long id)
+			throws ResourceNotFoundException {
+		Optional<Subject> subject = questionBankService.getSubjectById(id);
+		if (subject == null) {
+			new ResourceNotFoundException("Subject not found :: " + id);
+		}
+		questionBankService.deleteSubject(subject.get());
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted", Boolean.TRUE);
+		return response;
+	}
+	
+	@DeleteMapping("/auth/deleteCourse/{id}")
+	public Map<String, Boolean> deleteCourse(@PathVariable Long id)
+			throws ResourceNotFoundException {
+		Optional<Course> course = questionBankService.getCourseById(id);
+		if (course == null) {
+			new ResourceNotFoundException("Course not found :: " + id);
+		}
+		questionBankService.deleteCourse(course.get());
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted", Boolean.TRUE);
+		return response;
+	}
+	
 
 	/*// Find
 	@GetMapping("/auth/books")

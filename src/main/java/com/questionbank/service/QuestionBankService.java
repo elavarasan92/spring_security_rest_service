@@ -23,16 +23,32 @@ public class QuestionBankService {
 
 	@Autowired
 	private CourseRepository courseRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private YearRepository yearRepository;
-	
+
 	@Autowired
 	private SubjectRepository subjectRepository;
-	
+
+	public User getUserByName(String username) {
+		return userRepository.getUserByName(username);
+	}
+
+	public User validateOtp(String emailId, String otp) {
+		return userRepository.validateOTP(emailId, otp);
+	}
+
+	public User getUserByEmail(String email) {
+		return userRepository.getUserByEmail(email);
+	}
+
+	public void deleteUserByName(User user) {
+		userRepository.delete(user);
+	}
+
 	public List<Course> getAllCourses() {
 		return courseRepository.findAll();
 	}
@@ -43,35 +59,35 @@ public class QuestionBankService {
 
 	public List<Course> addCourses(@Valid List<Course> courseList) {
 		List<Course> courses = courseRepository.saveAll(courseList);
-		
-		for(Course course : courses) {
+
+		for (Course course : courses) {
 			List<Year> years = new ArrayList<Year>();
-			
-			for(int i=1;i<=course.getNoOfYears() ;i++) {
+
+			for (int i = 1; i <= course.getNoOfYears(); i++) {
 				Year year = new Year();
 				year.setCourseID(course.getCourseID());
-		        String yearName; 
-		        switch (i) { 
-		        case 1: 
-		            yearName = "FIRST_YEAR"; 
-		            break; 
-		        case 2: 
-		            yearName = "SECOND_YEAR"; 
-		            break; 
-		        case 3: 
-		            yearName = "THIRD_YEAR"; 
-		            break; 
-		        case 4: 
-		            yearName = "FOURTH_YEAR"; 
-		            break; 
-		        case 5: 
-		            yearName = "FIFTH_YEAR"; 
-		            break; 
-		        default: 
-		            yearName = "INVALID_YEAR"; 
-		            break; 
-		        } 
-		        System.out.println(yearName); 
+				String yearName;
+				switch (i) {
+				case 1:
+					yearName = "FIRST_YEAR";
+					break;
+				case 2:
+					yearName = "SECOND_YEAR";
+					break;
+				case 3:
+					yearName = "THIRD_YEAR";
+					break;
+				case 4:
+					yearName = "FOURTH_YEAR";
+					break;
+				case 5:
+					yearName = "FIFTH_YEAR";
+					break;
+				default:
+					yearName = "INVALID_YEAR";
+					break;
+				}
+				System.out.println(yearName);
 				year.setCreatedBy(course.getCreatedBy());
 				year.setYearName(yearName);
 				years.add(year);
@@ -80,32 +96,32 @@ public class QuestionBankService {
 		}
 		return courses;
 	}
-	
+
 	public List<Year> getYearsByCourseId(Long courseID) {
 		return yearRepository.getYearsByCourseId(courseID);
 	}
-	
+
 	public List<Year> addYearsForCourses(@Valid List<Year> yearList) {
 		return yearRepository.saveAll(yearList);
 	}
-	
+
 	public List<Subject> addSubjectForYears(@Valid List<Subject> subjectList) {
 		return subjectRepository.saveAll(subjectList);
 	}
 
-
 	public List<Subject> getSubjectsByYearId(Long yearID) {
 		return subjectRepository.getSubjectsByYearId(yearID);
 	}
+
 	public List<Year> getAllYears() {
 		return yearRepository.findAll();
 	}
-	
+
 	public List<Subject> getAllSubjects() {
 		return subjectRepository.findAll();
 	}
 
-	public Optional<Course> findById(Long id) {
+	public Optional<Course> checkCourse(Long id) {
 		return courseRepository.findById(id);
 	}
 
@@ -125,12 +141,32 @@ public class QuestionBankService {
 		return userRepository.save(user);
 	}
 
-	
-	public User checkUser(String username , String password) {
-		return userRepository.checkUser(username,password);
+	public User checkUser(String username, String password) {
+		return userRepository.checkUser(username, password);
 	}
 
-	
+	public Optional<Subject> checkSubject(Long id) {
+		return subjectRepository.findById(id);
+	}
 
-	
+	public Subject saveSubject(@Valid Subject subject) {
+		return subjectRepository.save(subject);
+	}
+
+	public void deleteSubject(Subject subject) {
+		subjectRepository.delete(subject);
+	}
+
+	public Optional<Subject> getSubjectById(Long id) {
+		return subjectRepository.findById(id);
+	}
+
+	public void deleteCourse(Course course) {
+		courseRepository.delete(course);
+	}
+
+	public Optional<Course> getCourseById(Long id) {
+		return courseRepository.findById(id);
+	}
+
 }
