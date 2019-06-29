@@ -111,14 +111,14 @@ public class QuestionBankController {
 		return questionBankService.getAllUsers();
 	}
 
-	@GetMapping("/auth/getUserById/{username}")
-	public ResponseEntity<User> getUserById(@PathVariable(value = "username") String username)
+	@GetMapping("/auth/getUserById/{userId}")
+	public ResponseEntity<User> getUserById(@PathVariable(value = "userId") Long userId)
 			throws ResourceNotFoundException {
-		User user = questionBankService.getUserByName(username);
+		Optional<User> user = questionBankService.getUserById(userId);
 		if (user == null) {
-			new ResourceNotFoundException("User not found :: " + username);
+			new ResourceNotFoundException("User not found :: " + userId);
 		}
-		return ResponseEntity.ok().body(user);
+		return ResponseEntity.ok().body(user.get());
 	}
 
 	

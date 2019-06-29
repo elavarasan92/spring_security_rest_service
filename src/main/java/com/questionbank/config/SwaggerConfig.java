@@ -26,7 +26,7 @@ public class SwaggerConfig {
 		aParameterBuilder.name("Authorization") // name of header
 				.description("Have to convert the username and password to base64 encoded text and give the value in below box")
 				.modelRef(new ModelRef("string")).parameterType("header") // type - header
-				.defaultValue("Basic YXJhdmluZDplbGF2YXJhc2FuQA==") // based64 of - aravind:elavarasan@
+				.defaultValue("Basic cmFtZXNoZWxhdmFAZ21haWwuY29tOmVsYXZhcmFzYW5A") // based64 of - rameshelava@gmail.com:elavarasan@
 				.required(true) // for compulsory
 				.build();
 		List<springfox.documentation.service.Parameter> aParameters = new ArrayList<>();

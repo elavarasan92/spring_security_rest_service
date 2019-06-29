@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -21,6 +22,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class User {
 
 	@Id
+	@GeneratedValue
+	@Column(name = "USER_ID")
+	private long userId;
 	@Column(name = "USERNAME")
 	private String username;
 	@Column(name = "FIRST_NAME")
@@ -31,6 +35,13 @@ public class User {
 	private String lastName;
 	@Column(name = "EMAIL_ADDRESS")
 	private String emailAddress;
+	public long getUserId() {
+		return userId;
+	}
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+
 	@Column(name = "MOBILE_NUMBER")
 	private String mobileNumber;
 
@@ -58,10 +69,10 @@ public class User {
 	
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", firstName=" + firstName + ", role=" + role + ", lastName=" + lastName
-				+ ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber + ", otp=" + otp + ", jsessionId="
-				+ jsessionId + ", password=" + password + ", createdBy=" + createdBy + ", createdDate=" + createdDate
-				+ ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
+		return "User [userId=" + userId + ", username=" + username + ", firstName=" + firstName + ", role=" + role
+				+ ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber
+				+ ", otp=" + otp + ", jsessionId=" + jsessionId + ", password=" + password + ", createdBy=" + createdBy
+				+ ", createdDate=" + createdDate + ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
 	}
 	public User() {
     }

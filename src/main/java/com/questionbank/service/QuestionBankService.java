@@ -36,6 +36,10 @@ public class QuestionBankService {
 	public User getUserByName(String username) {
 		return userRepository.getUserByName(username);
 	}
+	
+	public Optional<User> getUserById(Long userId) {
+		return userRepository.findById(userId);
+	}
 
 	public User validateOtp(String emailId, String otp) {
 		return userRepository.validateOTP(emailId, otp);
