@@ -1,5 +1,7 @@
 package com.questionbank.controller;
 
+import com.questionbank.exception.GlobalException;
+import com.questionbank.exception.ResourceAlreadyExistException;
 import com.questionbank.exception.ResourceNotFoundException;
 import com.questionbank.model.Course;
 import com.questionbank.model.Subject;
@@ -45,63 +47,61 @@ public class QuestionBankController {
 		responseHeaders.set("JSESSIONID", sessionId);
 		User user = questionBankService.getUserByName(authentication.getName());
 		if (user == null) {
-			new ResourceNotFoundException("User not found :: " + authentication.getName());
-		}else {
-			user.setJsessionId(sessionId);
+			throw new ResourceNotFoundException("USER_NOT_FOUND");
 		}
 		return ResponseEntity.ok()
 			      .headers(responseHeaders).body(user);
 	}
 
 	@PostMapping("/registerUser")
-	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) { 
+	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) throws ResourceAlreadyExistException{ 
 		User userDet =  questionBankService.getUserByName(user.getUsername());
 		if (userDet == null) {
 			userDet = questionBankService.registerUser(user);
 			return ResponseEntity.ok().body(userDet);
 		} else {
 			System.out.println("User creation failed");
-			return null;
+			throw new ResourceAlreadyExistException("USER_ALREADY_EXIST");
 		}
 	}
 	
 	@GetMapping("/forgotPassword/{emailId}")
-	public ResponseEntity<String> forgotPassword(@PathVariable(value = "emailId") String emailId) { 
+	public ResponseEntity<String> forgotPassword(@PathVariable(value = "emailId") String emailId) throws GlobalException { 
 		User userDet = questionBankService.getUserByEmail(emailId);
 		if (userDet != null) {
 			String otp = QUtils.getOTP();
 			userDet.setOtp(otp);
 			questionBankService.updateUser(userDet);
 			SendEmailTLS.sendOTP(emailId,otp);
-			return ResponseEntity.ok().body("OTP Sent successfully");
+			return ResponseEntity.ok().body("OTP_SENT_SUCCESSFULLY");
 		} else {
 			System.out.println("OTP creation failed");
-			return ResponseEntity.ok().body("Email or User doesnot exist ");
+			throw new GlobalException("EMAIL_DOESNOT_EXIST");
 		}
 	}
 	
 	
 	@GetMapping("/validateOTP/{emailId}/{otp}")
-	public ResponseEntity<String> validateOTP(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "otp") String otp) { 
+	public ResponseEntity<String> validateOTP(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "otp") String otp) throws GlobalException { 
 		User userDet = questionBankService.validateOtp(emailId,otp);
 		if (userDet != null) {
-			return ResponseEntity.ok().body("Valid otp");
+			return ResponseEntity.ok().body("VALID_OTP");
 		} else {
 			System.out.println("OTP validation failed");
-			return ResponseEntity.ok().body("Invalid otp");
+			throw new GlobalException("INVALID_OTP");
 		}
 	}
 	
 	@GetMapping("/resetPassword/{emailId}/{password}")
-	public ResponseEntity<String> resetPassword(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "password") String password) { 
+	public ResponseEntity<String> resetPassword(@PathVariable(value = "emailId") String emailId,@PathVariable(value = "password") String password) throws GlobalException { 
 		User userDet = questionBankService.getUserByEmail(emailId);
 		if (userDet != null) {
 			userDet.setPassword(password);
 			questionBankService.updateUser(userDet);
-			return ResponseEntity.ok().body("Password updated successfully");
+			return ResponseEntity.ok().body("PASSWORD_UPDATED_SUCCESSFULLY");
 		} else {
 			System.out.println("OTP creation failed");
-			return ResponseEntity.ok().body("Email or User doesnot exist ");
+			throw new GlobalException("EMAIL_DOESNOT_EXIST");
 		}
 	}
 	
@@ -115,8 +115,8 @@ public class QuestionBankController {
 	public ResponseEntity<User> getUserById(@PathVariable(value = "userId") Long userId)
 			throws ResourceNotFoundException {
 		Optional<User> user = questionBankService.getUserById(userId);
-		if (user == null) {
-			new ResourceNotFoundException("User not found :: " + userId);
+		if (!user.isPresent()) {
+			throw	new ResourceNotFoundException("USER_NOT_FOUND");
 		}
 		return ResponseEntity.ok().body(user.get());
 	}
@@ -128,7 +128,7 @@ public class QuestionBankController {
 			@Valid @RequestBody User userDetails) throws ResourceNotFoundException {
 		User user = questionBankService.getUserByName(username);
 		if (user == null) {
-			new ResourceNotFoundException("User not found :: " + username);
+			throw	new ResourceNotFoundException("USER_NOT_FOUND");
 		}
 		user.setEmailAddress(userDetails.getEmailAddress());
 		user.setLastName(userDetails.getLastName());
@@ -143,7 +143,7 @@ public class QuestionBankController {
 			throws ResourceNotFoundException {
 		User user = questionBankService.getUserByName(username);
 		if (user == null) {
-			new ResourceNotFoundException("User not found :: " + username);
+			throw	new ResourceNotFoundException("USER_NOT_FOUND");
 		}
 		questionBankService.deleteUserByName(user);
 		Map<String, Boolean> response = new HashMap<>();
@@ -158,10 +158,10 @@ public class QuestionBankController {
 
 
 	@PutMapping("/auth/updateCourse/{id}")
-	public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody Course course) {
+	public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody Course course)throws  ResourceNotFoundException{
 		if (!questionBankService.checkCourse(id).isPresent()) {
 			System.out.println("Id " + id + " is not existed");
-			ResponseEntity.badRequest().build();
+			throw new ResourceNotFoundException("COUSRSE_NOT_FOUND");
 		}
 		return ResponseEntity.ok(questionBankService.save(course));
 	}
@@ -174,7 +174,11 @@ public class QuestionBankController {
 	@GetMapping("/auth/getYearsByCourseId/{courseid}")
 	public List<Year> getYearsByCourseId(@PathVariable(value = "courseid") Long courseID)
 			throws ResourceNotFoundException {
-		return questionBankService.getYearsByCourseId(courseID);
+		List<Year> years = questionBankService.getYearsByCourseId(courseID);
+		if (years == null) {
+			throw	new ResourceNotFoundException("COURSE_ID_DOESNOT_EXIST");
+		}
+		return years;
 	}
 
 	@PostMapping("/auth/addYearsForCourses")
@@ -185,7 +189,11 @@ public class QuestionBankController {
 	@GetMapping("/auth/getSubjectsByYearId/{yearid}")
 	public List<Subject> getSubjectsByYearId(@PathVariable(value = "yearid") Long yearID)
 			throws ResourceNotFoundException {
-		return questionBankService.getSubjectsByYearId(yearID);
+		List<Subject> subjects =  questionBankService.getSubjectsByYearId(yearID);
+		if (subjects == null) {
+			throw	new ResourceNotFoundException("YEAR_ID_DOESNOT_EXIST");
+		}
+		return subjects;
 	}
 
 	@PostMapping("/auth/addSubjectForYears")
@@ -204,10 +212,10 @@ public class QuestionBankController {
 	}
 	
 	@PutMapping("/auth/updateSubject/{id}")
-	public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @Valid @RequestBody Subject subject) {
+	public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @Valid @RequestBody Subject subject)throws ResourceNotFoundException{
 		if (!questionBankService.checkSubject(id).isPresent()) {
 			System.out.println("Id " + id + " is not existed");
-			ResponseEntity.badRequest().build();
+			throw new ResourceNotFoundException("COUSRSE_NOT_FOUND");
 		}
 		return ResponseEntity.ok(questionBankService.saveSubject(subject));
 	}
@@ -217,7 +225,7 @@ public class QuestionBankController {
 			throws ResourceNotFoundException {
 		Optional<Subject> subject = questionBankService.getSubjectById(id);
 		if (subject == null) {
-			new ResourceNotFoundException("Subject not found :: " + id);
+			throw new ResourceNotFoundException("SUBJECT_ID_DOESNOT_EXIST");
 		}
 		questionBankService.deleteSubject(subject.get());
 		Map<String, Boolean> response = new HashMap<>();
@@ -230,7 +238,7 @@ public class QuestionBankController {
 			throws ResourceNotFoundException {
 		Optional<Course> course = questionBankService.getCourseById(id);
 		if (course == null) {
-			new ResourceNotFoundException("Course not found :: " + id);
+			throw new ResourceNotFoundException("COURSE_ID_DOESNOT_EXIST");
 		}
 		questionBankService.deleteCourse(course.get());
 		Map<String, Boolean> response = new HashMap<>();

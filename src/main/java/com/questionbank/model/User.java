@@ -9,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,14 +29,22 @@ public class User {
 	@Column(name = "USER_ID")
 	private long userId;
 	@Column(name = "USERNAME")
+	@NotNull(message = "username should not be null")
+	@Size(min =3, max = 50, message = "username must be between 3 and 50 characters")
 	private String username;
 	@Column(name = "FIRST_NAME")
+	@NotNull(message = "firstName should not be null")
+	@Size(min = 3, max = 50, message = "firstName must be between 3 and 50 characters")
 	private String firstName;
 	@Column(name = "ROLE")
+	@NotNull(message = "role should not be null")
+	@Size(min = 3, max = 20, message = "role must be between 3 and 20 characters")
 	private String role;
 	@Column(name = "LAST_NAME")
 	private String lastName;
 	@Column(name = "EMAIL_ADDRESS")
+	@NotNull(message = "emailAddress should not be null")
+	@Email(message = "emailAddress should be valid")
 	private String emailAddress;
 	public long getUserId() {
 		return userId;
@@ -43,6 +54,7 @@ public class User {
 	}
 
 	@Column(name = "MOBILE_NUMBER")
+	@NotNull
 	private String mobileNumber;
 
 	@Column(name = "OTP")
@@ -56,22 +68,13 @@ public class User {
 		this.otp = otp;
 	}
 
-	@Transient
-	private String jsessionId;
-	
-	public String getJsessionId() {
-		return jsessionId;
-	}
-	public void setJsessionId(String jsessionId) {
-		this.jsessionId = jsessionId;
-	}
 	
 	
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", username=" + username + ", firstName=" + firstName + ", role=" + role
 				+ ", lastName=" + lastName + ", emailAddress=" + emailAddress + ", mobileNumber=" + mobileNumber
-				+ ", otp=" + otp + ", jsessionId=" + jsessionId + ", password=" + password + ", createdBy=" + createdBy
+				+ ", otp=" + otp + ", password=" + password + ", createdBy=" + createdBy
 				+ ", createdDate=" + createdDate + ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
 	}
 	public User() {

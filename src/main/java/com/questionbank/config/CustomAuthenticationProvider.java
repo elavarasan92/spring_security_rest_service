@@ -34,7 +34,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 		User user = questionBankService.checkUser(name, password);
 
 		if (user == null) {
-			throw new BadCredentialsException("Authentication failed for " + name);
+			throw new BadCredentialsException("UNAUTHORIZED");
 		}
 
 		System.out.println("name : " + name);
