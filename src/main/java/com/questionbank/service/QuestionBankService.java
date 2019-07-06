@@ -52,6 +52,10 @@ public class QuestionBankService {
 	public void deleteUserByName(User user) {
 		userRepository.delete(user);
 	}
+	
+	public void deleteUserById(Long userId) {
+		userRepository.deleteById(userId);
+	}
 
 	public List<Course> getAllCourses() {
 		return courseRepository.findAll();

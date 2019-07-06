@@ -120,32 +120,49 @@ public class QuestionBankController {
 		}
 		return ResponseEntity.ok().body(user.get());
 	}
+	
+	@GetMapping("/auth/getCourseById/{courseId}")
+	public ResponseEntity<Course> getCourseById(@PathVariable(value = "courseId") Long courseId)
+			throws ResourceNotFoundException {
+		Optional<Course> course = questionBankService.getCourseById(courseId);
+		if (!course.isPresent()) {
+			throw	new ResourceNotFoundException("COURSE_NOT_FOUND");
+		}
+		return ResponseEntity.ok().body(course.get());
+	}
 
 	
 
-	@PutMapping("/auth/updateUser/{username}")
-	public ResponseEntity<User> updateUser(@PathVariable(value = "username") String username,
+	@PutMapping("/auth/updateUser/{userId}")
+	public ResponseEntity<User> updateUser(@PathVariable(value = "userId") Long userId,
 			@Valid @RequestBody User userDetails) throws ResourceNotFoundException {
-		User user = questionBankService.getUserByName(username);
-		if (user == null) {
+		Optional<User> userOpt = questionBankService.getUserById(userId);
+		if (!userOpt.isPresent()) {
 			throw	new ResourceNotFoundException("USER_NOT_FOUND");
 		}
+		User user = new User();
+		user.setUserId(userId);
 		user.setEmailAddress(userDetails.getEmailAddress());
 		user.setLastName(userDetails.getLastName());
 		user.setFirstName(userDetails.getFirstName());
 		user.setUpdatedDate(new Timestamp(new Date().getTime()));
+		user.setMobileNumber(userDetails.getMobileNumber());
+		user.setPassword(userDetails.getPassword());
+		user.setRole(userDetails.getRole());
+		user.setUpdatedBy(userDetails.getUpdatedBy());
+		user.setUsername(userDetails.getUsername());
 		final User updatedUser = questionBankService.updateUser(user);
 		return ResponseEntity.ok(updatedUser);
 	}
 
-	@DeleteMapping("/auth/deleteUser/{username}")
-	public Map<String, Boolean> deleteUser(@PathVariable(value = "username") String username)
+	@DeleteMapping("/auth/deleteUser/{userId}")
+	public Map<String, Boolean> deleteUser(@PathVariable(value = "userId") Long userId)
 			throws ResourceNotFoundException {
-		User user = questionBankService.getUserByName(username);
-		if (user == null) {
+		Optional<User> userOpt = questionBankService.getUserById(userId);
+		if (!userOpt.isPresent()) {
 			throw	new ResourceNotFoundException("USER_NOT_FOUND");
 		}
-		questionBankService.deleteUserByName(user);
+		questionBankService.deleteUserById(userId);
 		Map<String, Boolean> response = new HashMap<>();
 		response.put("deleted", Boolean.TRUE);
 		return response;
