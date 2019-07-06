@@ -18,9 +18,10 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
          
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.addHeader("WWW-Authenticate", "Basic realm=" + getRealmName() + "");
-         
+         System.out.println("Unauthorised user ");
         PrintWriter writer = response.getWriter();
         writer.println("HTTP Status 401 : " + authException.getMessage());
+        response.sendError(401, "Invalid credentials");
     }
      
     @Override
