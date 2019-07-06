@@ -16,12 +16,12 @@ public class CustomBasicAuthenticationEntryPoint extends BasicAuthenticationEntr
             final HttpServletResponse response, 
             final AuthenticationException authException) throws IOException, ServletException {
          
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
         response.addHeader("WWW-Authenticate", "Basic realm=" + getRealmName() + "");
          System.out.println("Unauthorised user ");
-        PrintWriter writer = response.getWriter();
-        writer.println("HTTP Status 401 : " + authException.getMessage());
-        response.sendError(401, "Invalid credentials");
+       // PrintWriter writer = response.getWriter();
+        //writer.println("HTTP Status 401 : " + authException.getMessage());
+        response.sendError(406, "Invalid credentials");
     }
      
     @Override
