@@ -126,7 +126,7 @@ public class QuestionBankController {
 			throws ResourceNotFoundException {
 		Optional<Course> course = questionBankService.getCourseById(courseId);
 		if (!course.isPresent()) {
-			throw	new ResourceNotFoundException("COURSE_NOT_FOUND");
+			throw	new ResourceNotFoundException("COURSE_ID_DOESNOT_EXIST");
 		}
 		return ResponseEntity.ok().body(course.get());
 	}
@@ -178,7 +178,7 @@ public class QuestionBankController {
 	public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody Course course)throws  ResourceNotFoundException{
 		if (!questionBankService.checkCourse(id).isPresent()) {
 			System.out.println("Id " + id + " is not existed");
-			throw new ResourceNotFoundException("COUSRSE_NOT_FOUND");
+			throw new ResourceNotFoundException("COURSE_ID_DOESNOT_EXIST");
 		}
 		return ResponseEntity.ok(questionBankService.save(course));
 	}
@@ -212,6 +212,17 @@ public class QuestionBankController {
 		}
 		return subjects;
 	}
+	
+	@GetMapping("/auth/getSubjectById/{subjectId}")
+	public ResponseEntity<Subject> getSubjectById(@PathVariable(value = "subjectId") Long subjectId)
+			throws ResourceNotFoundException {
+		Optional<Subject> subject = questionBankService.getSubjectById(subjectId);
+		if (!subject.isPresent()) {
+			throw	new ResourceNotFoundException("SUBJECT_ID_DOESNOT_EXIST");
+		}
+		return ResponseEntity.ok().body(subject.get());
+	}
+	
 
 	@PostMapping("/auth/addSubjectForYears")
 	public List<Subject> addSubjectForYears(@Valid @RequestBody List<Subject> subjectList) {
@@ -241,7 +252,7 @@ public class QuestionBankController {
 	public Map<String, Boolean> deleteSubject(@PathVariable Long id)
 			throws ResourceNotFoundException {
 		Optional<Subject> subject = questionBankService.getSubjectById(id);
-		if (subject == null) {
+		if (!subject.isPresent()) {
 			throw new ResourceNotFoundException("SUBJECT_ID_DOESNOT_EXIST");
 		}
 		questionBankService.deleteSubject(subject.get());
@@ -254,7 +265,7 @@ public class QuestionBankController {
 	public Map<String, Boolean> deleteCourse(@PathVariable Long id)
 			throws ResourceNotFoundException {
 		Optional<Course> course = questionBankService.getCourseById(id);
-		if (course == null) {
+		if (!course.isPresent()) {
 			throw new ResourceNotFoundException("COURSE_ID_DOESNOT_EXIST");
 		}
 		questionBankService.deleteCourse(course.get());
